@@ -179,8 +179,7 @@ func TestAccAWSVpcEndpoint_gatewayWithRouteTableAndPolicy(t *testing.T) {
 func TestAccAWSVpcEndpoint_gatewayPolicy(t *testing.T) {
 	var endpoint ec2.VpcEndpoint
 	// This policy checks the DiffSuppressFunc
-	policy1 := `
-{
+	policy1 := `{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -195,20 +194,23 @@ func TestAccAWSVpcEndpoint_gatewayPolicy(t *testing.T) {
       ]
     }
   ]
-}
-`
-	policy2 := `
-{
+}`
+
+	policy2 := `{
   "Version": "2012-10-17",
-  "Statement": [{
-    "Sid": "AllowAll",
-    "Effect": "Allow",
-    "Principal": {"AWS": "*" },
-    "Action": "*",
-    "Resource": "*"
-  }]
-}
-`
+  "Statement": [
+    {
+      "Sid": "AllowAll",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "*",
+      "Resource": "*"
+    }
+  ]
+}`
+
 	resourceName := "aws_vpc_endpoint.test"
 	rName := acctest.RandomWithPrefix("tf-acc-test")
 
@@ -602,7 +604,7 @@ resource "aws_vpc" "test" {
 data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id       = "${aws_vpc.test.id}"
+  vpc_id       = aws_vpc.test.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 `, rName)
@@ -619,7 +621,7 @@ resource "aws_vpc" "test" {
 }
 
 resource "aws_subnet" "test" {
-  vpc_id     = "${aws_vpc.test.id}"
+  vpc_id     = aws_vpc.test.id
   cidr_block = "10.0.1.0/24"
 
   tags = {
@@ -630,23 +632,27 @@ resource "aws_subnet" "test" {
 data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id       = "${aws_vpc.test.id}"
+  vpc_id       = aws_vpc.test.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 
   route_table_ids = [
-    "${aws_route_table.test.id}",
+    aws_route_table.test.id,
   ]
 
   policy = <<POLICY
 {
   "Version": "2012-10-17",
-  "Statement": [{
-    "Sid": "AllowAll",
-    "Effect": "Allow",
-    "Principal": {"AWS": "*" },
-    "Action": "*",
-    "Resource": "*"
-  }]
+  "Statement": [
+    {
+      "Sid": "AllowAll",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "*",
+      "Resource": "*"
+    }
+  ]
 }
 POLICY
 
@@ -656,7 +662,7 @@ POLICY
 }
 
 resource "aws_route_table" "test" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -664,8 +670,8 @@ resource "aws_route_table" "test" {
 }
 
 resource "aws_route_table_association" "test" {
-  subnet_id      = "${aws_subnet.test.id}"
-  route_table_id = "${aws_route_table.test.id}"
+  subnet_id      = aws_subnet.test.id
+  route_table_id = aws_route_table.test.id
 }
 `, rName)
 }
@@ -681,7 +687,7 @@ resource "aws_vpc" "test" {
 }
 
 resource "aws_subnet" "test" {
-  vpc_id     = "${aws_vpc.test.id}"
+  vpc_id     = aws_vpc.test.id
   cidr_block = "10.0.1.0/24"
 
   tags = {
@@ -692,7 +698,7 @@ resource "aws_subnet" "test" {
 data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id       = "${aws_vpc.test.id}"
+  vpc_id       = aws_vpc.test.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 
   route_table_ids = []
@@ -700,12 +706,12 @@ resource "aws_vpc_endpoint" "test" {
   policy = ""
 
   tags = {
-    Name  = %[1]q
+    Name = %[1]q
   }
 }
 
 resource "aws_internet_gateway" "test" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -713,11 +719,11 @@ resource "aws_internet_gateway" "test" {
 }
 
 resource "aws_route_table" "test" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.test.id}"
+    gateway_id = aws_internet_gateway.test.id
   }
 
   tags = {
@@ -726,8 +732,8 @@ resource "aws_route_table" "test" {
 }
 
 resource "aws_route_table_association" "test" {
-  subnet_id      = "${aws_subnet.test.id}"
-  route_table_id = "${aws_route_table.test.id}"
+  subnet_id      = aws_subnet.test.id
+  route_table_id = aws_route_table.test.id
 }
 `, rName)
 }
@@ -743,19 +749,19 @@ resource "aws_vpc" "test" {
 }
 
 data "aws_security_group" "test" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
   name   = "default"
 }
 
 data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id            = "${aws_vpc.test.id}"
+  vpc_id            = aws_vpc.test.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.ec2"
   vpc_endpoint_type = "Interface"
 
   security_group_ids = [
-    "${data.aws_security_group.test.id}",
+    data.aws_security_group.test.id,
   ]
 }
 `, rName)
@@ -777,8 +783,8 @@ resource "aws_vpc" "test" {
 
 resource "aws_vpc_endpoint" "test" {
   policy       = <<POLICY%[2]sPOLICY
-  service_name = "${data.aws_vpc_endpoint_service.test.service_name}"
-  vpc_id       = "${aws_vpc.test.id}"
+  service_name = data.aws_vpc_endpoint_service.test.service_name
+  vpc_id       = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -811,9 +817,9 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_subnet" "test1" {
-  vpc_id            = "${aws_vpc.test.id}"
-  cidr_block        = "${cidrsubnet(aws_vpc.test.cidr_block, 2, 0)}"
-  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+  vpc_id            = aws_vpc.test.id
+  cidr_block        = cidrsubnet(aws_vpc.test.cidr_block, 2, 0)
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     Name = %[1]q
@@ -821,9 +827,9 @@ resource "aws_subnet" "test1" {
 }
 
 resource "aws_subnet" "test2" {
-  vpc_id            = "${aws_vpc.test.id}"
-  cidr_block        = "${cidrsubnet(aws_vpc.test.cidr_block, 2, 1)}"
-  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  vpc_id            = aws_vpc.test.id
+  cidr_block        = cidrsubnet(aws_vpc.test.cidr_block, 2, 1)
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = %[1]q
@@ -831,9 +837,9 @@ resource "aws_subnet" "test2" {
 }
 
 resource "aws_subnet" "test3" {
-  vpc_id            = "${aws_vpc.test.id}"
-  cidr_block        = "${cidrsubnet(aws_vpc.test.cidr_block, 2, 2)}"
-  availability_zone = "${data.aws_availability_zones.available.names[2]}"
+  vpc_id            = aws_vpc.test.id
+  cidr_block        = cidrsubnet(aws_vpc.test.cidr_block, 2, 2)
+  availability_zone = data.aws_availability_zones.available.names[2]
 
   tags = {
     Name = %[1]q
@@ -841,7 +847,7 @@ resource "aws_subnet" "test3" {
 }
 
 resource "aws_security_group" "test1" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -849,7 +855,7 @@ resource "aws_security_group" "test1" {
 }
 
 resource "aws_security_group" "test2" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -857,18 +863,18 @@ resource "aws_security_group" "test2" {
 }
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id              = "${aws_vpc.test.id}"
+  vpc_id              = aws_vpc.test.id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ec2"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = false
 
   subnet_ids = [
-    "${aws_subnet.test1.id}",
+    aws_subnet.test1.id,
   ]
 
   security_group_ids = [
-    "${aws_security_group.test1.id}",
-    "${aws_security_group.test2.id}",
+    aws_security_group.test1.id,
+    aws_security_group.test2.id,
   ]
 
   tags = {
@@ -902,9 +908,9 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_subnet" "test1" {
-  vpc_id            = "${aws_vpc.test.id}"
-  cidr_block        = "${cidrsubnet(aws_vpc.test.cidr_block, 2, 0)}"
-  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+  vpc_id            = aws_vpc.test.id
+  cidr_block        = cidrsubnet(aws_vpc.test.cidr_block, 2, 0)
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     Name = %[1]q
@@ -912,9 +918,9 @@ resource "aws_subnet" "test1" {
 }
 
 resource "aws_subnet" "test2" {
-  vpc_id            = "${aws_vpc.test.id}"
-  cidr_block        = "${cidrsubnet(aws_vpc.test.cidr_block, 2, 1)}"
-  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  vpc_id            = aws_vpc.test.id
+  cidr_block        = cidrsubnet(aws_vpc.test.cidr_block, 2, 1)
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = %[1]q
@@ -922,9 +928,9 @@ resource "aws_subnet" "test2" {
 }
 
 resource "aws_subnet" "test3" {
-  vpc_id            = "${aws_vpc.test.id}"
-  cidr_block        = "${cidrsubnet(aws_vpc.test.cidr_block, 2, 2)}"
-  availability_zone = "${data.aws_availability_zones.available.names[2]}"
+  vpc_id            = aws_vpc.test.id
+  cidr_block        = cidrsubnet(aws_vpc.test.cidr_block, 2, 2)
+  availability_zone = data.aws_availability_zones.available.names[2]
 
   tags = {
     Name = %[1]q
@@ -932,7 +938,7 @@ resource "aws_subnet" "test3" {
 }
 
 resource "aws_security_group" "test1" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -940,7 +946,7 @@ resource "aws_security_group" "test1" {
 }
 
 resource "aws_security_group" "test2" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -948,19 +954,19 @@ resource "aws_security_group" "test2" {
 }
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id              = "${aws_vpc.test.id}"
+  vpc_id              = aws_vpc.test.id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ec2"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
 
   subnet_ids = [
-    "${aws_subnet.test1.id}",
-    "${aws_subnet.test2.id}",
-    "${aws_subnet.test3.id}",
+    aws_subnet.test1.id,
+    aws_subnet.test2.id,
+    aws_subnet.test3.id,
   ]
 
   security_group_ids = [
-    "${aws_security_group.test1.id}",
+    aws_security_group.test1.id,
   ]
 
   tags = {
@@ -984,8 +990,8 @@ resource "aws_lb" "test" {
   name = %[1]q
 
   subnets = [
-    "${aws_subnet.test1.id}",
-    "${aws_subnet.test2.id}",
+    aws_subnet.test1.id,
+    aws_subnet.test2.id,
   ]
 
   load_balancer_type         = "network"
@@ -1010,9 +1016,9 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_subnet" "test1" {
-  vpc_id            = "${aws_vpc.test.id}"
+  vpc_id            = aws_vpc.test.id
   cidr_block        = "10.0.1.0/24"
-  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     Name = %[1]q
@@ -1020,9 +1026,9 @@ resource "aws_subnet" "test1" {
 }
 
 resource "aws_subnet" "test2" {
-  vpc_id            = "${aws_vpc.test.id}"
+  vpc_id            = aws_vpc.test.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = %[1]q
@@ -1033,12 +1039,12 @@ resource "aws_vpc_endpoint_service" "test" {
   acceptance_required = true
 
   network_load_balancer_arns = [
-    "${aws_lb.test.id}",
+    aws_lb.test.id,
   ]
 }
 
 resource "aws_security_group" "test" {
-  vpc_id = "${aws_vpc.test.id}"
+  vpc_id = aws_vpc.test.id
 
   tags = {
     Name = %[1]q
@@ -1046,14 +1052,14 @@ resource "aws_security_group" "test" {
 }
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id              = "${aws_vpc.test.id}"
-  service_name        = "${aws_vpc_endpoint_service.test.service_name}"
+  vpc_id              = aws_vpc.test.id
+  service_name        = aws_vpc_endpoint_service.test.service_name
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = false
   auto_accept         = %[2]t
 
   security_group_ids = [
-    "${aws_security_group.test.id}",
+    aws_security_group.test.id,
   ]
 
   tags = {
@@ -1076,7 +1082,7 @@ resource "aws_vpc" "test" {
 data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id       = "${aws_vpc.test.id}"
+  vpc_id       = aws_vpc.test.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 
   tags = {
@@ -1099,7 +1105,7 @@ resource "aws_vpc" "test" {
 data "aws_region" "current" {}
 
 resource "aws_vpc_endpoint" "test" {
-  vpc_id       = "${aws_vpc.test.id}"
+  vpc_id       = aws_vpc.test.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 
   tags = {
